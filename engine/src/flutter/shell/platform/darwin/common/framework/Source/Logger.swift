@@ -120,7 +120,10 @@ final class SyslogOutputWriter: OutputWriter {
   func writeLine(level: LogLevel, _ message: String) {
     // TODO(cbracken): replace this with os_log-based approach.
     // https://github.com/flutter/flutter/issues/44030
-    message.withCString { vsyslog(LOG_ALERT, "%s", getVaList([$0])) }
+    // Build a C `va_list` from the Swift string and pass it to vsyslog.
+    withVaList([message]) { vaList in
+      vsyslog(LOG_ALERT, "%s", vaList)
+    }
   }
 }
 
